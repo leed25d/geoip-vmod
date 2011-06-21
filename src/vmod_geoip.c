@@ -5,13 +5,13 @@
 #include <GeoIP.h>
 #include "vcc_if.h"
 
-        static GeoIP *gi = NULL;
+static GeoIP *gi = NULL;
 
 int
 init_function(struct vmod_priv *priv, const struct VCL_conf *conf)
 {
-        if(!gi) { gi = GeoIP_new(GEOIP_STANDARD); }
-	return (0);
+    if(!gi) { gi = GeoIP_new(GEOIP_STANDARD); }
+    return (0);
 }
 
 const char *

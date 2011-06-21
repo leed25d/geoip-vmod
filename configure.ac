@@ -56,6 +56,24 @@ AC_CHECK_FILE([$VARNISHSRC/bin/varnishtest/varnishtest],
 	[AC_MSG_FAILURE([Can't find "$VARNISHSRC/bin/varnishtest/varnishtest". Please build your varnish source directory])]
 )
 
+# Check for GeoIP
+AC_ARG_WITH([geoip],
+    [  --with-geoip=PATH       find the GeoIP SDK installed in PATH],
+    [
+        CPPFLAGS="$CPPFLAGS -I${withval}/include"
+        LDFLAGS="$LDFLAGS -L${withval}/lib"
+    ], 
+    []
+)
+AC_CHECK_LIB([GeoIP], [GeoIP_assign_region_by_inetaddr], 
+    [AC_CHECK_HEADER([GeoIP.h],
+        [],
+        [AC_MSG_ERROR([Failed to find the GeoIP SDK (1).  Specify --with-geoip=PATH])]
+    )],
+    [AC_MSG_ERROR([Failed to find the GeoIP SDK (2).  Specify --with-geoip=PATH])]
+)
+LIBS="$LIBS -lGeoIP"
+
 # vmod installation dir
 AC_ARG_VAR([VMODDIR], [vmod installation directory @<:@LIBDIR/varnish/vmods@:>@])
 if test "x$VMODDIR" = x; then

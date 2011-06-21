@@ -1,0 +1,22 @@
+varnishtest "Test GeoIP vmod"
+
+server s1 {
+       rxreq
+       txresp
+} -start
+
+varnish v1 -vcl+backend {
+	import geoip from "${vmod_topbuild}/src/.libs/libvmod_geoip.so";
+
+	sub vcl_recv {
+		set req.http.X-GeoIP = geoip.country("127.0.0.1");
+	}
+} -start
+
+client c1 {
+	txreq -url "/"
+	rxresp
+	expect req.http.X-GeoIP == "Unknown"
+}
+
+client c1 -run

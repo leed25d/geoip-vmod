@@ -1,0 +1,3 @@
+Module geoip
+Init init_function
+Function STRING country(STRING)

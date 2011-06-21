@@ -1,0 +1,21 @@
+Usage:
+./configure VARNISHSRC=DIR
+
+VARNISHSRC is the directory of the Varnish source tree for which to
+compile your vmod. Both the VARNISHSRC and VARNISHSRC/include
+will be added to the include search paths for your module.
+
+Make targets:
+make - builds the vmod
+make install - installs your vmod in VMODDIR
+make check - runs the unit tests in src/tests/*.vtc
+
+In your VCL you could then use this vmod like the following. This
+sets the request header X-GeoIP to the requestor's geo (or Unknown).
+
+import geoip;
+
+sub vcl_recv {
+        set req.http.X-Forwarded-For = client.ip;
+	set req.http.X-GeoIP = geoip.country(req.http.X-Forwarded-For)
+}

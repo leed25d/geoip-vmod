@@ -63,7 +63,7 @@ AC_ARG_WITH([geoip],
         CPPFLAGS="$CPPFLAGS -I${withval}/include"
         LDFLAGS="$LDFLAGS -L${withval}/lib"
     ], 
-    []
+    [:]
 )
 AC_CHECK_LIB([GeoIP], [GeoIP_assign_region_by_inetaddr], 
     [AC_CHECK_HEADER([GeoIP.h],

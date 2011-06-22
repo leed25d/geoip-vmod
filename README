@@ -21,8 +21,6 @@ sets the request header X-GeoIP to the requestor's geo (or Unknown).
     | }
     `----
 
-
-
 CREDITS: 
 
    the idea for this varnish module and the proof of concept and the

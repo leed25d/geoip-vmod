@@ -16,6 +16,15 @@ sets the request header X-GeoIP to the requestor's geo (or Unknown).
 import geoip;
 
 sub vcl_recv {
-        set req.http.X-Forwarded-For = client.ip;
-	set req.http.X-GeoIP = geoip.country(req.http.X-Forwarded-For)
+    set req.http.X-Forwarded-For = client.ip;
+    set req.http.X-GeoIP = geoip.country(req.http.X-Forwarded-For)
 }
+
+
+CREDITS: 
+
+   the idea for this varnish module and the proof of concept and the
+   initial implementation are all due to David Newhall II
+
+   Lee Doolan, the maintainer, added libtool configuration details,
+   added thread safety, added SCM (git).

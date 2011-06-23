@@ -11,7 +11,6 @@
 static GeoIP *gi = NULL;
 static pthread_mutex_t gi_mutex;
 static const char *unknownCountry= "Unknown";
-static char wspace[8192];
 
 int
 init_function(struct vmod_priv *priv, const struct VCL_conf *conf)
@@ -43,5 +42,5 @@ vmod_country(struct sess *sp, const char *ip)
     cp= WS_Dup(sp->wrk->ws, country);
     pthread_mutex_unlock(&gi_mutex);
 
-    return(cp);
+    return(cp ? cp : unknownCountry);
 }

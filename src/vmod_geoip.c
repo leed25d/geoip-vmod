@@ -35,7 +35,6 @@ init_function(struct vmod_priv *priv, const struct VCL_conf *conf)
 const char *
 vmod_country(struct sess *sp, const char *ip)
 {
-    int ret;
     const char *country = NULL;
     char *cp;
     static GeoIP *gi = NULL;

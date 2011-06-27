@@ -1,7 +1,6 @@
 /**/
 #include <stdlib.h>
 #include <GeoIP.h>
-#include <pthread.h>
 
 #include "vrt.h"
 #include "bin/varnishd/cache.h"
@@ -26,19 +25,15 @@
 //  `----
 
 static const char *unknownCountry= "AA";
-static pthread_mutex_t critSec_mtx;
+
 int
 init_function(struct vmod_priv *priv, const struct VCL_conf *conf)
 {
-    int ret;
-    ret = pthread_mutex_init(&critSec_mtx, NULL);
-    assert (ret == 0);
     return (0);
 }
 
-
 const char *
-critical_section(struct sess *sp, const char *ip)
+vmod_country(struct sess *sp, const char *ip)
 {
     const char *country = NULL;
     char *cp;
@@ -57,20 +52,4 @@ critical_section(struct sess *sp, const char *ip)
       GeoIP_delete(gi);
     }
     return(cp);
-}
-
-
-
-
-const char *
-vmod_country(struct sess *sp, const char *ip)
-{
-    int ret;
-    const char *cp;
-    
-    ret = pthread_mutex_lock(&critSec_mtx);
-    assert (ret == 0);
-    cp= critical_section(sp, ip);
-    pthread_mutex_unlock(&critSec_mtx);
-    return(cp);   
 }

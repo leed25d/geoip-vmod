@@ -1,4 +1,15 @@
+########################################################################
+##                     E X P E R I M E N T A L                        ##
+##                                                                    ##
+##  For the time being, this module is experimental.  Once it has     ##
+##  been fully tested and ready for general release, this             ##
+##  notification will be removed.  In the meantime, if you discover   ##
+##  and problems with the code here, please let me know.              ##
+##                         lee@livejournalinc.com                     ##
+########################################################################
+
 Usage:
+
 ./configure VARNISHSRC=DIR
 
 VARNISHSRC is the directory of the Varnish source tree for which to
@@ -14,14 +25,14 @@ In your VCL you could then use this vmod like the following. This
 sets the request header X-GeoIP to the requestor's geo (or Unknown).
     ,----
     | import geoip;
-    | 
+    |
     | sub vcl_recv {
     |     set req.http.X-Forwarded-For = client.ip;
     |     set req.http.X-GeoIP = geoip.country(req.http.X-Forwarded-For)
     | }
     `----
 
-CREDITS: 
+CREDITS:
 
    the idea for this varnish module and the proof of concept and the
    initial implementation are all due to David Newhall II

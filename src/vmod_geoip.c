@@ -37,7 +37,7 @@ vmod_country(struct sess *sp, const char *ip)
 {
     const char *country = NULL;
     char *cp;
-    static GeoIP *gi = NULL;
+    GeoIP *gi = NULL;
 
     gi = GeoIP_new(GEOIP_STANDARD);
     if (gi) {

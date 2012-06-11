@@ -38,15 +38,16 @@ vmod_country(struct sess *sp, const char *ip)
 {
     const char *country = NULL;
     char *cp;
+    int cache_strategy = GEOIP_MMAP_CACHE | GEOIP_CHECK_CACHE;
     GeoIP *gi = NULL;
 
     if (strchr(ip, ':')) {
-      gi = GeoIP_open_type(GEOIP_COUNTRY_EDITION_V6, GEOIP_MMAP_CACHE | GEOIP_CHECK_CACHE);
+      gi = GeoIP_open_type(GEOIP_COUNTRY_EDITION_V6, cache_strategy);
       if (gi) {
         country = GeoIP_country_code_by_addr_v6(gi, ip);
       }
     } else {
-      gi = GeoIP_open_type(GEOIP_COUNTRY_EDITION, GEOIP_MMAP_CACHE | GEOIP_CHECK_CACHE);
+      gi = GeoIP_open_type(GEOIP_COUNTRY_EDITION, cache_strategy);
       if (gi) {
         country = GeoIP_country_code_by_addr(gi, ip);
       }

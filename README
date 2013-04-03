@@ -1,3 +1,41 @@
+==========
+geoip-vmod
+==========
+
+---------------------------
+Varnish GeoIP Module
+---------------------------
+
+:Author: Lee Doolan
+
+SYNOPSIS
+========
+
+import geoip;
+
+DESCRIPTION
+===========
+
+This Varnish module lets you add VCL that sets the request header 
+X-GeoIP to the requestor's geo (or Unknown).
+
+Requires GeoIP library (on Debian install libgeoip-dev)
+
+INSTALLATION
+============
+
+The source tree is based on autotools to configure the building, and
+does also have the necessary bits in place to do functional unit tests
+using the varnishtest tool.
+
+Install the GeoIP library headers::
+
+ apt-get install libgeoip-dev
+
+To check out the current development source::
+
+ git clone git://github.com/leed25d/geoip-vmod.git
+ cd geoip-vmod; ./autogen.sh
 
 Usage:
 
@@ -23,10 +61,26 @@ sets the request header X-GeoIP to the requestor's geo (or Unknown).
     | }
     `----
 
-CREDITS:
+HISTORY
+=======
 
-   the idea for this varnish module and the proof of concept and the
-   initial implementation are all due to David Newhall II
+Manpage based on the libvmod-example by Varnish Software and tHauke Lampe's
+own GeoIP Vmod on https://github.com/lampeh/libvmod-geoip
 
-   Lee Doolan, the maintainer, added libtool configuration details,
-   added thread safety, added SCM (git).
+CREDITS
+=======
+The idea for this varnish module and the proof of concept and the   
+initial implementation are all due to David Newhall II
+
+Lee Doolan, the maintainer, added libtool configuration details,   
+added thread safety, added SCM (git). Stability patch provided by Varnish
+Software.
+
+COPYRIGHT
+=========
+
+This document is licensed under the same license as the
+libvmod-example project. See LICENSE for details.
+
+* Copyright (c) 2011 Livejounal
+* Copyright (c) 2012 Varnish Software

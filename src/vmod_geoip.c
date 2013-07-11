@@ -25,10 +25,14 @@
 //  `----
 
 static const char *unknownCountry= "AA";
-
+static GeoIP *gi;
 int
 init_function(struct vmod_priv *priv, const struct VCL_conf *conf)
 {
+    if (gi) {
+      GeoIP_delete(gi);
+    }
+    gi = GeoIP_new(GEOIP_STANDARD);
     return (0);
 }
 
@@ -37,9 +41,15 @@ vmod_country(struct sess *sp, const char *ip)
 {
     const char *country = NULL;
     char *cp;
-    GeoIP *gi = NULL;
 
-    gi = GeoIP_new(GEOIP_STANDARD);
+    if (!gi) {
+        gi = GeoIP_new(GEOIP_STANDARD);
+        if (gi) {
+            WSP(sp, SLT_VCL_Log, "GeoIP database was loaded on request.");
+        } else {
+            WSP(sp, SLT_VCL_Log, "GeoIP database was not loaded on request.");
+        }
+    }
     if (gi) {
       country = GeoIP_country_code_by_addr(gi, ip);
     }
@@ -48,8 +58,5 @@ vmod_country(struct sess *sp, const char *ip)
     }
     cp= WS_Dup(sp->wrk->ws, country);
 
-    if (gi) {
-      GeoIP_delete(gi);
-    }
     return(cp);
 }

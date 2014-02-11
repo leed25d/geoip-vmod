@@ -3,8 +3,7 @@
 #include <GeoIP.h>
 
 #include "vrt.h"
-#include "bin/varnishd/cache.h"
-#include "include/vct.h"
+#include "cache/cache.h"
 #include "vcc_if.h"
 
 //  Are there any code elements available which I myself can
@@ -36,8 +35,8 @@ init_function(struct vmod_priv *priv, const struct VCL_conf *conf)
     return (0);
 }
 
-const char *
-vmod_country(struct sess *sp, const char *ip)
+VCL_STRING
+vmod_country(const struct vrt_ctx *ctx, const char *ip)
 {
     const char *country = NULL;
     char *cp;
@@ -45,18 +44,18 @@ vmod_country(struct sess *sp, const char *ip)
     if (!gi) {
         gi = GeoIP_new(GEOIP_STANDARD);
         if (gi) {
-            WSP(sp, SLT_VCL_Log, "GeoIP database was loaded on request.");
+            VSLb(ctx->vsl, SLT_VCL_Log, "GeoIP database was loaded on request.");
         } else {
-            WSP(sp, SLT_VCL_Log, "GeoIP database was not loaded on request.");
+            VSLb(ctx->vsl, SLT_VCL_Log, "GeoIP database was not loaded on request.");
         }
     }
     if (gi) {
       country = GeoIP_country_code_by_addr(gi, ip);
     }
     if (!country) {
-      country= unknownCountry;
+      country = unknownCountry;
     }
-    cp= WS_Dup(sp->wrk->ws, country);
+    cp = WS_Copy(ctx->ws, country, strlen(country));
 
     return(cp);
 }

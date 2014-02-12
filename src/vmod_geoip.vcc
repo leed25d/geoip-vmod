@@ -3,3 +3,5 @@ $Init init_function
 $Function STRING country(PRIV_VCL, STRING)
 $Function STRING country_code(PRIV_VCL, STRING)
 $Function STRING country_code_from_ip(PRIV_VCL, IP)
+$Function STRING organization(PRIV_VCL, STRING)
+$Function STRING organization_from_ip(PRIV_VCL, IP)

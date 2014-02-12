@@ -23,13 +23,15 @@
 //  | should inform the ISO 3166/MA of such use.
 //  `----
 
-static const char *unknownCountry= "AA";
+static const char *unknownCountry = "AA";
+static const char *unknownOrg = "Unknown organization";
 
 /**
  * Keep a pointer to each GeoIP database.
  */
 struct GeoIP_databases {
     GeoIP* country;
+    GeoIP* org;
 };
 
 /**
@@ -45,6 +47,8 @@ static void free_databases(void* ptr)
     struct GeoIP_databases* db = (struct GeoIP_databases*)ptr;
     if (db->country)
         GeoIP_delete(db->country);
+    if (db->org)
+        GeoIP_delete(db->org);
 
     free(ptr);
 }
@@ -57,7 +61,9 @@ init_function(struct vmod_priv *pp, const struct VCL_conf *conf)
         return 1;
     struct GeoIP_databases* db = (struct GeoIP_databases*)pp->priv;
 
-    db->country = GeoIP_new(GEOIP_STANDARD);
+    db->country = GeoIP_new(GEOIP_MMAP_CACHE);
+    db->org = GeoIP_open(GeoIPDBFileName[GEOIP_ORG_EDITION], GEOIP_MMAP_CACHE);
+
     pp->free = &free_databases;
     return (0);
 }
@@ -90,4 +96,28 @@ VCL_STRING
 vmod_country_code_from_ip(const struct vrt_ctx* ctx, struct vmod_priv* pp, const struct suckaddr* ip)
 {
     return vmod_country(ctx, pp, VRT_IP_string(ctx, ip));
+}
+
+/**
+ * Organization
+ */
+VCL_STRING
+vmod_organization(const struct vrt_ctx *ctx, struct vmod_priv *pp, const char *ip)
+{
+    const char *org = NULL;
+    if (pp->priv)
+    {
+        struct GeoIP_databases* db = (struct GeoIP_databases*)pp->priv;
+        if (db && db->org)
+            org = GeoIP_org_by_addr(db->org, ip);
+    }
+    if (!org)
+        org = unknownOrg;
+    return WS_Copy(ctx->ws, org, strlen(org));
+}
+
+VCL_STRING
+vmod_organization_from_ip(const struct vrt_ctx* ctx, struct vmod_priv* pp, const struct suckaddr* ip)
+{
+    return vmod_organization(ctx, pp, VRT_IP_string(ctx, ip));
 }

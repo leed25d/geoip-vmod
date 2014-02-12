@@ -25,10 +25,21 @@
 
 static const char *unknownCountry= "AA";
 
+/**
+ * Keep a pointer to each GeoIP database.
+ */
 struct GeoIP_databases {
     GeoIP* country;
 };
 
+/**
+ * Manage the GeoIP databases at startup and exit.
+ *
+ * We try to open each database one by one. Failing to open one of them is
+ * not fatal because some of them may just not be installed on the system
+ * (for example the Organization db). In that case, all request for an
+ * organization name will return the unknownCountry code.
+ */
 static void free_databases(void* ptr)
 {
     struct GeoIP_databases* db = (struct GeoIP_databases*)ptr;
@@ -51,6 +62,9 @@ init_function(struct vmod_priv *pp, const struct VCL_conf *conf)
     return (0);
 }
 
+/**
+ * Country code.
+ */
 VCL_STRING
 vmod_country(const struct vrt_ctx *ctx, struct vmod_priv *pp, const char *ip)
 {
@@ -67,4 +81,16 @@ vmod_country(const struct vrt_ctx *ctx, struct vmod_priv *pp, const char *ip)
     cp = WS_Copy(ctx->ws, country, strlen(country));
 
     return(cp);
+}
+
+VCL_STRING
+vmod_country_code(const struct vrt_ctx *ctx, struct vmod_priv *pp, const char *ip)
+{
+    return vmod_country(ctx, pp, ip);
+}
+
+VCL_STRING
+vmod_country_code_from_ip(const struct vrt_ctx* ctx, struct vmod_priv* pp, const struct suckaddr* ip)
+{
+    return vmod_country(ctx, pp, VRT_IP_string(ctx, ip));
 }

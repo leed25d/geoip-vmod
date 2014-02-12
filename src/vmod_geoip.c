@@ -24,37 +24,46 @@
 //  `----
 
 static const char *unknownCountry= "AA";
-static GeoIP *gi;
-int
-init_function(struct vmod_priv *priv, const struct VCL_conf *conf)
+
+struct GeoIP_databases {
+    GeoIP* country;
+};
+
+static void free_databases(void* ptr)
 {
-    if (gi) {
-      GeoIP_delete(gi);
-    }
-    gi = GeoIP_new(GEOIP_STANDARD);
+    struct GeoIP_databases* db = (struct GeoIP_databases*)ptr;
+    if (db->country)
+        GeoIP_delete(db->country);
+
+    free(ptr);
+}
+
+int
+init_function(struct vmod_priv *pp, const struct VCL_conf *conf)
+{
+    pp->priv = malloc(sizeof(struct GeoIP_databases));
+    if (!pp->priv)
+        return 1;
+    struct GeoIP_databases* db = (struct GeoIP_databases*)pp->priv;
+
+    db->country = GeoIP_new(GEOIP_STANDARD);
+    pp->free = &free_databases;
     return (0);
 }
 
 VCL_STRING
-vmod_country(const struct vrt_ctx *ctx, const char *ip)
+vmod_country(const struct vrt_ctx *ctx, struct vmod_priv *pp, const char *ip)
 {
     const char *country = NULL;
     char *cp;
-
-    if (!gi) {
-        gi = GeoIP_new(GEOIP_STANDARD);
-        if (gi) {
-            VSLb(ctx->vsl, SLT_VCL_Log, "GeoIP database was loaded on request.");
-        } else {
-            VSLb(ctx->vsl, SLT_VCL_Log, "GeoIP database was not loaded on request.");
-        }
+    if (pp->priv)
+    {
+        struct GeoIP_databases* db = (struct GeoIP_databases*)pp->priv;
+        if (db && db->country)
+            country = GeoIP_country_code_by_addr(db->country, ip);
     }
-    if (gi) {
-      country = GeoIP_country_code_by_addr(gi, ip);
-    }
-    if (!country) {
-      country = unknownCountry;
-    }
+    if (!country)
+        country = unknownCountry;
     cp = WS_Copy(ctx->ws, country, strlen(country));
 
     return(cp);

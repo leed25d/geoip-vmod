@@ -69,7 +69,6 @@ VCL_STRING
 vmod_country(const struct vrt_ctx *ctx, struct vmod_priv *pp, const char *ip)
 {
     const char *country = NULL;
-    char *cp;
     if (pp->priv)
     {
         struct GeoIP_databases* db = (struct GeoIP_databases*)pp->priv;
@@ -78,9 +77,7 @@ vmod_country(const struct vrt_ctx *ctx, struct vmod_priv *pp, const char *ip)
     }
     if (!country)
         country = unknownCountry;
-    cp = WS_Copy(ctx->ws, country, strlen(country));
-
-    return(cp);
+    return WS_Copy(ctx->ws, country, strlen(country));
 }
 
 VCL_STRING

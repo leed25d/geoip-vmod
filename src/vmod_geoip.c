@@ -25,6 +25,7 @@
 
 static const char *unknownCountry = "AA";
 static const char *unknownOrg = "Unknown organization";
+static const char *unknownRegion = "Unknown region";
 
 /**
  * Keep a pointer to each GeoIP database.
@@ -32,6 +33,7 @@ static const char *unknownOrg = "Unknown organization";
 struct GeoIP_databases {
     GeoIP* country;
     GeoIP* org;
+    GeoIP* region;
 };
 
 /**
@@ -49,6 +51,8 @@ static void free_databases(void* ptr)
         GeoIP_delete(db->country);
     if (db->org)
         GeoIP_delete(db->org);
+    if (db->region)
+        GeoIP_delete(db->region);
 
     free(ptr);
 }
@@ -63,6 +67,7 @@ init_function(struct vmod_priv *pp, const struct VCL_conf *conf)
 
     db->country = GeoIP_new(GEOIP_MMAP_CACHE);
     db->org = GeoIP_open(GeoIPDBFileName[GEOIP_ORG_EDITION], GEOIP_MMAP_CACHE);
+    db->region = GeoIP_open(GeoIPDBFileName[GEOIP_REGION_EDITION_REV1], GEOIP_MMAP_CACHE);
 
     pp->free = &free_databases;
     return (0);
@@ -120,4 +125,37 @@ VCL_STRING
 vmod_organization_from_ip(const struct vrt_ctx* ctx, struct vmod_priv* pp, const struct suckaddr* ip)
 {
     return vmod_organization(ctx, pp, VRT_IP_string(ctx, ip));
+}
+
+/**
+ * Region
+ */
+VCL_STRING
+vmod_region(const struct vrt_ctx *ctx, struct vmod_priv *pp, const char *ip)
+{
+    const char *region = NULL;
+
+    if (pp->priv)
+    {
+        struct GeoIP_databases* db = (struct GeoIP_databases*)pp->priv;
+        if (db && db->region)
+        {
+            GeoIPRegion *gir;
+            if ((gir = GeoIP_region_by_addr(db->region, ip)) != NULL)
+            {
+                region = GeoIP_region_name_by_code(gir->country_code, gir->region);
+                GeoIPRegion_delete(gir);
+            }
+        }
+
+    }
+    if (!region)
+        region = unknownRegion;
+    return WS_Copy(ctx->ws, region, strlen(region));
+}
+
+VCL_STRING
+vmod_region_from_ip(const struct vrt_ctx* ctx, struct vmod_priv* pp, const struct suckaddr* ip)
+{
+    return vmod_region(ctx, pp, VRT_IP_string(ctx, ip));
 }

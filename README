@@ -73,6 +73,25 @@ If the given IP is invalid, or cannot be found in the database, the returned
 country code is "AA", which is an invalid country code used in this module
 to indicate an error.
 
+FUNCTIONS
+=========
+
+country_code
+------------
+Prototype
+	STRING country_code(STRING)
+
+Returns the country code (or "AA", if the given IP is invalid, a country
+code can not be found).
+
+country_code_from_ip
+--------------------
+Prototype
+	STRING country_code_from_ip(IP)
+
+Just like country_code, but takes an IP as argument instead of a string.
+
+
 HISTORY
 =======
 

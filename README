@@ -91,6 +91,33 @@ Prototype
 
 Just like country_code, but takes an IP as argument instead of a string.
 
+organization
+------------
+	STRING organization(STRING)
+
+Returns the organization (or "Unknown organization" if the given IP is
+invalid, an organization can not be found or the organization database could
+not be found).
+
+organization_from_ip
+--------------------
+	STRING organization_from_ip(IP]
+
+Just like organization, but takes an IP as argument instead of a string.
+
+region
+------
+	STRING region(STRING)
+
+Returns the region (or "Unknown region" if the given IP is invalid, an
+region can not be found or the region database could not be found).
+
+region_from_ip
+--------------
+	STRING region_from_ip(STRING)
+
+Just like region, but takes an IP as argument instead of a string.
+
 
 HISTORY
 =======

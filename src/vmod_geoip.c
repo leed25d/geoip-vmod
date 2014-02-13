@@ -88,7 +88,7 @@ vmod_country(const struct vrt_ctx *ctx, struct vmod_priv *pp, const char *ip)
     }
     if (!country)
         country = unknownCountry;
-    return WS_Copy(ctx->ws, country, strlen(country));
+    return WS_Copy(ctx->ws, country, -1);
 }
 
 VCL_STRING
@@ -118,7 +118,7 @@ vmod_organization(const struct vrt_ctx *ctx, struct vmod_priv *pp, const char *i
     }
     if (!org)
         org = unknownOrg;
-    return WS_Copy(ctx->ws, org, strlen(org));
+    return WS_Copy(ctx->ws, org, -1);
 }
 
 VCL_STRING
@@ -151,7 +151,7 @@ vmod_region(const struct vrt_ctx *ctx, struct vmod_priv *pp, const char *ip)
     }
     if (!region)
         region = unknownRegion;
-    return WS_Copy(ctx->ws, region, strlen(region));
+    return WS_Copy(ctx->ws, region, -1);
 }
 
 VCL_STRING

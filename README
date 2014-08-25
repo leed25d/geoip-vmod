@@ -30,7 +30,7 @@ using the varnishtest tool.
 
 Install the GeoIP library headers::
 
- apt-get install libgeoip-dev
+ apt-get install libgeoip-dev pkg-config
 
 To check out the current development source::
 

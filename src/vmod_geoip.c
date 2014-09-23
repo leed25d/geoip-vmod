@@ -1,6 +1,7 @@
 /**/
 #include <stdlib.h>
 #include <GeoIP.h>
+#include <GeoIPCity.h>
 
 #include "vrt.h"
 #include "cache/cache.h"
@@ -26,6 +27,7 @@
 static const char *unknownCountry = "AA";
 static const char *unknownOrg = "Unknown organization";
 static const char *unknownRegion = "Unknown region";
+static const char *unknownCity = "Unknown City";
 
 /**
  * Keep a pointer to each GeoIP database.
@@ -34,6 +36,7 @@ struct GeoIP_databases {
     GeoIP* country;
     GeoIP* org;
     GeoIP* region;
+    GeoIP* city;
 };
 
 /**
@@ -68,6 +71,7 @@ init_function(struct vmod_priv *pp, const struct VCL_conf *conf)
     db->country = GeoIP_new(GEOIP_MMAP_CACHE);
     db->org = GeoIP_open(GeoIPDBFileName[GEOIP_ORG_EDITION], GEOIP_MMAP_CACHE);
     db->region = GeoIP_open(GeoIPDBFileName[GEOIP_REGION_EDITION_REV1], GEOIP_MMAP_CACHE);
+    db->city = GeoIP_open(GeoIPDBFileName[GEOIP_CITY_EDITION_REV1], GEOIP_MMAP_CACHE);
 
     pp->free = &free_databases;
     return (0);
@@ -159,3 +163,43 @@ vmod_region_from_ip(const struct vrt_ctx* ctx, struct vmod_priv* pp, const struc
 {
     return vmod_region(ctx, pp, VRT_IP_string(ctx, ip));
 }
+
+/**
+ * City
+ */
+VCL_STRING
+vmod_city(const struct vrt_ctx *ctx, struct vmod_priv *pp, const char *ip)
+{
+    const char *city = NULL;
+
+    if (pp->priv)
+    {
+        struct GeoIP_databases* db = (struct GeoIP_databases*)pp->priv;
+        if (db && db->city)
+        {
+            GeoIPRecord *gir;
+            if ((gir = GeoIP_record_by_addr(db->city, ip)) != NULL)
+            {
+                if (gir->city)
+                {
+                    city = WS_Copy(ctx->ws, gir->city, -1);
+                }
+                else
+                {
+                    city = WS_Copy(ctx->ws, unknownCity, -1);
+                }
+                GeoIPRecord_delete(gir);
+            }
+        }
+
+    }
+
+    return city;
+}
+
+VCL_STRING
+vmod_city_from_ip(const struct vrt_ctx* ctx, struct vmod_priv* pp, const struct suckaddr* ip)
+{
+    return vmod_city(ctx, pp, VRT_IP_string(ctx, ip));
+}
+

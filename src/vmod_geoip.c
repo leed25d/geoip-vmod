@@ -3,6 +3,7 @@
 #include <GeoIP.h>
 #include <GeoIPCity.h>
 
+#include "vcl.h"
 #include "vrt.h"
 #include "cache/cache.h"
 #include "vcc_if.h"
@@ -60,9 +61,12 @@ static void free_databases(void* ptr)
     free(ptr);
 }
 
-int
-init_function(struct vmod_priv *pp, const struct VCL_conf *conf)
+int __match_proto__(vmod_init_f)
+event_function(VRT_CTX, struct vmod_priv *pp, enum vcl_event_e e)
 {
+    if (e != VCL_EVENT_LOAD)
+        return 0;
+
     pp->priv = malloc(sizeof(struct GeoIP_databases));
     if (!pp->priv)
         return 1;

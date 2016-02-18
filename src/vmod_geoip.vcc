@@ -1,5 +1,5 @@
 $Module geoip Varnish GeoIP Module
-$Init init_function
+$Event event_function
 $Function STRING country(PRIV_VCL, STRING)
 $Function STRING country_code(PRIV_VCL, STRING)
 $Function STRING country_code_from_ip(PRIV_VCL, IP)
